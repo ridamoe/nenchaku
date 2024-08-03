@@ -49,17 +49,19 @@ def info():
         "available_proxies": [website.metadata.key for website in websites]
         })
 
-@app.route('/match/<path:url>', methods=['GET'])
-def match(url):
+@app.route('/match', methods=['GET'])
+def match():
     result = None
-    for w in websites:
-        match = w.match.parse(url)
-        if match:
-            result = {
-                "website": w.metadata.key,
-                **match
-            }
-            break
+    url = request.args.get("url")
+    if url:
+        for w in websites:
+            match = w.match.parse(url)
+            if match:
+                result = {
+                    "website": w.metadata.key,
+                    "params": list(match.values())
+                }
+                break
     return jsonify({"result": result})
 
 
