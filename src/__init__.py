@@ -65,7 +65,7 @@ def match():
     return jsonify({"result": result})
 
 
-@app.route('/<website_key>/series/<path:data>', methods=['GET'])
+@app.route('/website/<website_key>/series/<path:data>', methods=['GET'])
 @website_from_key(websites)
 def series(website: jidouteki.Website, data):
     data = data.split("/")
@@ -83,7 +83,7 @@ def series(website: jidouteki.Website, data):
     
     return jsonify({"result": result if result else None})
 
-@app.route('/<website_key>/chapter/pages/<path:data>', methods=['GET'])
+@app.route('/website/<website_key>/chapter/pages/<path:data>', methods=['GET'])
 @website_from_key(websites)
 def pages(website: jidouteki.Website, data):
     result = None
