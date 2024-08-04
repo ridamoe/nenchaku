@@ -7,6 +7,7 @@ from .utils import *
 
 app = Flask(__name__)
 app.json.sort_keys = False
+app.url_map.strict_slashes = False
 
 jdtk = Jidouteki(
     proxy="http://localhost/api/proxy?url="
@@ -59,35 +60,41 @@ def match():
             if match:
                 result = {
                     "website": w.metadata.key,
-                    "params": list(match.values())
+                    "params": match
                 }
                 break
     return jsonify({"result": result})
 
 
+@app.route('/website/<website_key>/series', methods=['GET'])
 @app.route('/website/<website_key>/series/<path:data>', methods=['GET'])
 @website_from_key(websites)
-def series(website: jidouteki.Website, data):
+def series(website: jidouteki.Website, data = ""):
     data = data.split("/")
+    kdata = request.args.to_dict()
     result = {}
 
     if website.series:
         if website.series.cover:
-            result["cover"] = website.series.cover.parse(*data)
+            result["cover"] = website.series.cover.parse(*data, **kdata)
             
         if website.series.title:
-            result["title"] = website.series.title.parse(*data)
+            result["title"] = website.series.title.parse(*data, **kdata)
         
         if website.series.chapters:
-            result["chapters"] = website.series.chapters.parse(*data)
+            result["chapters"] = website.series.chapters.parse(*data, **kdata)
     
     return jsonify({"result": result if result else None})
 
+@app.route('/website/<website_key>/chapter/pages', methods=['GET'])
 @app.route('/website/<website_key>/chapter/pages/<path:data>', methods=['GET'])
 @website_from_key(websites)
 def pages(website: jidouteki.Website, data):
+    data = data.split("/")
+    kdata = request.args.to_dict()
     result = None
-    pages = website.chapter.pages.parse(*data.split("/"))
+    
+    pages = website.chapter.pages.parse(*data, **kdata)
     if pages:
         base = base_substr(pages)
         pages = [page.removeprefix(base) for page in pages]
