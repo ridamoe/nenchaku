@@ -39,7 +39,6 @@ def proxy():
     for key, value in fetched.headers.items():
         if key not in ["Date", "Server", "Connection", "Content-Encoding", "Transfer-Encoding"]:
             resp.headers.set(key, value)
-    print(len(fetched.content), fetched.content.hex())
     if request.method == 'GET': resp.set_data(fetched.content)
     
     return resp
