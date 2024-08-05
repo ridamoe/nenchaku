@@ -98,11 +98,11 @@ def pages(website: jidouteki.Website, data):
         base = base_substr(pages)
         pages = [page.removeprefix(base) for page in pages]
         
-        result = {
+        result = [{
             "name":  website.metadata.display_name,
             "base": base,
             "pages": pages
-        }
+        }]
     return jsonify({"result": result})
 
 
