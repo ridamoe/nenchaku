@@ -88,7 +88,7 @@ def series(website: jidouteki.Website, data = ""):
 @app.route('/website/<website_key>/chapter/pages', methods=['GET'])
 @app.route('/website/<website_key>/chapter/pages/<path:data>', methods=['GET'])
 @website_from_key(websites)
-def pages(website: jidouteki.Website, data):
+def pages(website: jidouteki.Website, data = ""):
     data = data.split("/")
     kdata = request.args.to_dict()
     result = None
