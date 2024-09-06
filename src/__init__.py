@@ -2,6 +2,7 @@ import json
 import requests
 from jidouteki import Jidouteki
 import re
+import os
 from flask import Flask, jsonify, request, Response
 from .utils import *
 
@@ -10,7 +11,7 @@ app.json.sort_keys = False
 app.url_map.strict_slashes = False
 
 jdtk = Jidouteki(
-    proxy="http://localhost/api/proxy?url="
+    proxy = os.environ.get("PUBLIC_API_ENDPOINT", "http://localhost/api") + "/proxy"
 )
 websites = jdtk.load_all("./configs")
 
