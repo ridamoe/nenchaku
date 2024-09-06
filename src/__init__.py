@@ -61,7 +61,7 @@ def match():
             match = w.match.parse(url)
             if match:
                 result = {
-                    "website": w.metadata.key,
+                    "key": w.metadata.key,
                     "params": match
                 }
                 break
