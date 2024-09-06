@@ -45,9 +45,12 @@ def proxy():
 
 @app.route('/info', methods=['GET'])
 def info():
-    return jsonify({
-        "available_proxies": [website.metadata.key for website in websites]
-        })
+    data = {}
+    for website in websites:
+        data[website.metadata.key] = {
+            "chapters": "chapter" in website.images.fetcher.params
+        }     
+    return jsonify({"websites": data})
 
 @app.route('/match', methods=['GET'])
 def match():
@@ -93,7 +96,7 @@ def pages(website: jidouteki.Website, data = ""):
     kdata = request.args.to_dict()
     result = None
     
-    pages = website.chapter.pages.parse(*data, **kdata)
+    pages = website.images.parse(*data, **kdata)
     if pages:
         base = base_substr(pages)
         pages = [page.removeprefix(base) for page in pages]
