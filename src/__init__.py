@@ -47,10 +47,16 @@ def proxy():
 def info():
     data = {}
     for website in websites:
+        has_chapters = "chapter" in website.images.fetcher.params
+        auto_chapters = has_chapters and website.series != None and website.series.chapters != None
+        
         data[website.metadata.key] = {
-            "chapters": "chapter" in website.images.fetcher.params
+            "chapters": {
+                "supported": has_chapters,
+                "auto": auto_chapters
+            }
         }     
-    return jsonify({"websites": data})
+    return jsonify({"result": data})
 
 @app.route('/match', methods=['GET'])
 def match():
