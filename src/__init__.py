@@ -69,34 +69,31 @@ def match():
 
 
 @app.route('/website/<website_key>/series', methods=['GET'])
-@app.route('/website/<website_key>/series/<path:data>', methods=['GET'])
 @website_from_key(websites)
 def series(website: jidouteki.Website, data = ""):
-    data = data.split("/")
     kdata = request.args.to_dict()
+    
     result = {}
 
     if website.series:
         if website.series.cover:
-            result["cover"] = website.series.cover.parse(*data, **kdata)
+            result["cover"] = website.series.cover.parse(**kdata)
             
         if website.series.title:
-            result["title"] = website.series.title.parse(*data, **kdata)
+            result["title"] = website.series.title.parse(**kdata)
         
         if website.series.chapters:
-            result["chapters"] = website.series.chapters.parse(*data, **kdata)
+            result["chapters"] = website.series.chapters.parse(**kdata)
     
     return jsonify({"result": result if result else None})
 
 @app.route('/website/<website_key>/chapter/pages', methods=['GET'])
-@app.route('/website/<website_key>/chapter/pages/<path:data>', methods=['GET'])
 @website_from_key(websites)
 def pages(website: jidouteki.Website, data = ""):
-    data = data.split("/")
     kdata = request.args.to_dict()
     result = None
     
-    pages = website.images.parse(*data, **kdata)
+    pages = website.images.parse(**kdata)
     if pages:
         base = base_substr(pages)
         pages = [page.removeprefix(base) for page in pages]
