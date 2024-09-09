@@ -1,4 +1,3 @@
-import json
 import requests
 from jidouteki import Jidouteki
 import re
@@ -13,7 +12,7 @@ app.url_map.strict_slashes = False
 jdtk = Jidouteki(
     proxy = os.environ.get("PUBLIC_API_ENDPOINT", "http://localhost/api") + "/proxy"
 )
-websites = jdtk.load_all("./configs")
+configs = jdtk.load_directory("./configs")
 
 @app.route('/proxy/', methods=['GET', 'OPTIONS'])
 def proxy():
@@ -47,11 +46,11 @@ def proxy():
 @app.route('/info', methods=['GET'])
 def info():
     data = {}
-    for website in websites:
-        has_chapters = "chapter" in website.images.fetcher.params
-        auto_chapters = has_chapters and website.series != None and website.series.chapters != None
+    for config in configs:
+        has_chapters = "chapter" in config.params("images")
+        auto_chapters = config.has("series.chapters")
         
-        data[website.metadata.key] = {
+        data[config.meta.key] = {
             "chapters": {
                 "supported": has_chapters,
                 "auto": auto_chapters
@@ -64,49 +63,48 @@ def match():
     result = None
     url = request.args.get("url")
     if url:
-        for w in websites:
-            match = w.match.parse(url)
+        for w in configs:
+            match = w.match(url)
             if match:
                 result = {
-                    "key": w.metadata.key,
+                    "key": w.meta.key,
                     "params": match
                 }
                 break
     return jsonify({"result": result})
 
 
-@app.route('/website/<website_key>/series', methods=['GET'])
-@website_from_key(websites)
-def series(website: jidouteki.Website, data = ""):
+@app.route('/website/<config_key>/series', methods=['GET'])
+@config_from_key(configs)
+def series(config: jidouteki.Config, data = ""):
     kdata = request.args.to_dict()
     
     result = {}
 
-    if website.series:
-        if website.series.cover:
-            result["cover"] = website.series.cover.parse(**kdata)
-            
-        if website.series.title:
-            result["title"] = website.series.title.parse(**kdata)
-        
-        if website.series.chapters:
-            result["chapters"] = website.series.chapters.parse(**kdata)
+    if config.has("series.cover"): 
+        result["cover"] = config.series.cover(**kdata)
     
+    if config.has("series.title"): 
+        result["title"] = config.series.title(**kdata)
+        
+    if config.has("series.chapters"): 
+        result["chapters"] = config.series.chapters(**kdata)
+                
     return jsonify({"result": result if result else None})
 
-@app.route('/website/<website_key>/chapter/pages', methods=['GET'])
-@website_from_key(websites)
-def pages(website: jidouteki.Website, data = ""):
+@app.route('/website/<config_key>/images', methods=['GET'])
+@config_from_key(configs)
+def pages(config: jidouteki.Config, data = ""):
     kdata = request.args.to_dict()
     result = None
     
-    pages = website.images.parse(**kdata)
+    pages = config.images(**kdata)
     if pages:
         base = base_substr(pages)
         pages = [page.removeprefix(base) for page in pages]
         
         result = [{
-            "name":  website.metadata.display_name,
+            "name":  config.meta.display_name,
             "base": base,
             "pages": pages
         }]

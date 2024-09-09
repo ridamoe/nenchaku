@@ -22,13 +22,13 @@ def base_substr(lst):
     x = min(count_starting(s, b"\x00") for s in xored)
     return first[:x]
 
-def website_from_key(websites: List[jidouteki.Website]):
-    def _website_from_key(f):
+def config_from_key(configs: List[jidouteki.Config]):
+    def _config_from_key(f):
         @wraps(f)
-        def __website(website_key, *args, **kwargs):
-            w: jidouteki.Website = next((w for w in websites if w.metadata.key == website_key), None)
-            if w == None: return abort(400)
-            result = f(w, *args, **kwargs)
+        def __config(config_key, *args, **kwargs):
+            c: jidouteki.Config = next((c for c in configs if c.meta.key == config_key), None)
+            if c == None: return abort(400)
+            result = f(c, *args, **kwargs)
             return result
-        return __website
-    return _website_from_key
+        return __config
+    return _config_from_key
