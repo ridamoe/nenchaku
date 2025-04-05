@@ -12,7 +12,7 @@ app.url_map.strict_slashes = False
 jdtk = Jidouteki(
     proxy = os.environ.get("PUBLIC_API_ENDPOINT", "http://localhost/api") + "/proxy"
 )
-configs = jdtk.load_directory("./configs")
+providers = jdtk.load_directory("./providers")
 
 @app.route('/proxy/', methods=['GET', 'OPTIONS'])
 def proxy():
@@ -46,11 +46,11 @@ def proxy():
 @app.route('/info', methods=['GET'])
 def info():
     data = {}
-    for config in configs:
-        has_chapters = "chapter" in config.params("images")
-        auto_chapters = config.has("series.chapters")
+    for provider in providers:
+        has_chapters = "chapter" in provider.params("images")
+        auto_chapters = provider.has("series.chapters")
         
-        data[config.meta.key] = {
+        data[provider.meta.key] = {
             "chapters": {
                 "supported": has_chapters,
                 "auto": auto_chapters
@@ -63,7 +63,7 @@ def match():
     result = None
     url = request.args.get("url")
     if url:
-        for w in configs:
+        for w in providers:
             match = w.match(url)
             if match:
                 result = {
@@ -74,9 +74,9 @@ def match():
     return jsonify({"result": result})
 
 
-@app.route('/website/<config_key>/series', methods=['GET'])
-@config_from_key(configs)
-def series(config: jidouteki.Config, data = ""):
+@app.route('/website/<provider_key>/series', methods=['GET'])
+@provider_from_key(providers)
+def series(config: jidouteki.Provider, data = ""):
     kdata = request.args.to_dict()
     
     result = {}
@@ -92,21 +92,21 @@ def series(config: jidouteki.Config, data = ""):
                 
     return jsonify({"result": result if result else None})
 
-@app.route('/website/<config_key>/images', methods=['GET'])
-@config_from_key(configs)
-def pages(config: jidouteki.Config, data = ""):
+@app.route('/website/<provider_key>/images', methods=['GET'])
+@provider_from_key(providers)
+def images(config: jidouteki.Provider, data = ""): # TODO: rename to "galleries"
     kdata = request.args.to_dict()
     result = None
     
-    pages = config.images(**kdata)
-    if pages:
-        base = base_substr(pages)
-        pages = [page.removeprefix(base) for page in pages]
+    images = config.images(**kdata)
+    if images:
+        base = base_substr(images)
+        images = [page.removeprefix(base) for page in images]
         
         result = [{
             "name":  config.meta.display_name,
             "base": base,
-            "pages": pages
+            "images": images
         }]
     return jsonify({"result": result})
 
