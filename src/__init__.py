@@ -12,7 +12,7 @@ app.url_map.strict_slashes = False
 jdtk = Jidouteki(
     proxy = os.environ.get("PUBLIC_API_ENDPOINT", "http://localhost/api") + "/proxy"
 )
-providers = jdtk.load_directory("./providers")
+providers = jdtk.load_directory("./lib/jidouteki-providers/providers")
 
 @app.route('/proxy/', methods=['GET', 'OPTIONS'])
 def proxy():
