@@ -66,7 +66,7 @@ def match():
     url = request.args.get("url")
     if url:
         for w in providers:
-            match = w.match(url)
+            match = w.get.match(url)
             if match:
                 result = {
                     "key": w.meta.key,
@@ -84,13 +84,13 @@ def series(provider: jidouteki.Provider, data = ""):
     result = {}
 
     if provider.has("series.cover"): 
-        result["cover"] = provider.series.cover(**kdata)
+        result["cover"] = provider.get.series.cover(**kdata)
     
     if provider.has("series.title"): 
-        result["title"] = provider.series.title(**kdata)
+        result["title"] = provider.get.series.title(**kdata)
         
     if provider.has("series.chapters"): 
-        result["chapters"] = provider.series.chapters(**kdata)
+        result["chapters"] = provider.get.series.chapters(**kdata)
                 
     return jsonify({"result": result if result else None})
 
@@ -100,7 +100,7 @@ def images(provider: jidouteki.Provider, data = ""): # TODO: rename to "gallerie
     kdata = request.args.to_dict()
     result = None
     
-    images = provider.images(**kdata)
+    images = provider.get.images(**kdata)
     if images:
         base = base_substr(images)
         images = [page.removeprefix(base) for page in images]
