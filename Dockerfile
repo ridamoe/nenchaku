@@ -16,6 +16,7 @@ FROM python:3.12 AS base
 WORKDIR /tmp/lib
 COPY lib/jidouteki ./jidouteki
 
+ENV PROVIDERS_DIR=/app/lib/jidouteki-providers/providers
 WORKDIR /app/lib/jidouteki-providers
 COPY lib/jidouteki-providers .
 RUN pip install -r requirements.txt
