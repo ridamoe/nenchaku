@@ -78,35 +78,35 @@ def match():
 
 @app.route('/website/<provider_key>/series', methods=['GET'])
 @provider_from_key(providers)
-def series(config: jidouteki.Provider, data = ""):
+def series(provider: jidouteki.Provider, data = ""):
     kdata = request.args.to_dict()
     
     result = {}
 
-    if config.has("series.cover"): 
-        result["cover"] = config.series.cover(**kdata)
+    if provider.has("series.cover"): 
+        result["cover"] = provider.series.cover(**kdata)
     
-    if config.has("series.title"): 
-        result["title"] = config.series.title(**kdata)
+    if provider.has("series.title"): 
+        result["title"] = provider.series.title(**kdata)
         
-    if config.has("series.chapters"): 
-        result["chapters"] = config.series.chapters(**kdata)
+    if provider.has("series.chapters"): 
+        result["chapters"] = provider.series.chapters(**kdata)
                 
     return jsonify({"result": result if result else None})
 
 @app.route('/website/<provider_key>/images', methods=['GET'])
 @provider_from_key(providers)
-def images(config: jidouteki.Provider, data = ""): # TODO: rename to "galleries"
+def images(provider: jidouteki.Provider, data = ""): # TODO: rename to "galleries"
     kdata = request.args.to_dict()
     result = None
     
-    images = config.images(**kdata)
+    images = provider.images(**kdata)
     if images:
         base = base_substr(images)
         images = [page.removeprefix(base) for page in images]
         
         result = [{
-            "name":  config.meta.display_name,
+            "name":  provider.meta.display_name,
             "base": base,
             "images": images
         }]
