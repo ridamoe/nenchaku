@@ -49,13 +49,10 @@ def proxy():
 def info():
     data = {}
     for provider in providers:
-        has_chapters = "chapter" in provider.params("images")
-        auto_chapters = provider.has("series.chapters")
-        
         data[provider.meta.key] = {
             "chapters": {
-                "supported": has_chapters,
-                "auto": auto_chapters
+                "supported": "chapter" in provider.params.images,
+                "auto": provider.has.series.chapters
             }
         }     
     return jsonify({"result": data})
@@ -83,13 +80,13 @@ def series(provider: jidouteki.Provider, data = ""):
     
     result = {}
 
-    if provider.has("series.cover"): 
+    if provider.has.series.cover: 
         result["cover"] = provider.get.series.cover(**kdata)
     
-    if provider.has("series.title"): 
+    if provider.has.series.title: 
         result["title"] = provider.get.series.title(**kdata)
         
-    if provider.has("series.chapters"): 
+    if provider.has.series.chapters: 
         result["chapters"] = provider.get.series.chapters(**kdata)
                 
     return jsonify({"result": result if result else None})
