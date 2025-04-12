@@ -13,8 +13,8 @@ jdtk = Jidouteki(
     proxy = os.environ.get("PUBLIC_API_ENDPOINT", "http://localhost/api") + "/proxy"
 )
 
-providers_dir = os.environ.get("PROVIDERS_DIR", "./providers")
-providers = jdtk.load_directory(providers_dir)
+parsers_dir = os.environ.get("PARSERS_DIR", "./parsers")
+providers = jdtk.load_directory(parsers_dir)
 
 @app.route('/proxy/', methods=['GET', 'OPTIONS'])
 def proxy():

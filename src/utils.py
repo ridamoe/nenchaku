@@ -23,12 +23,12 @@ def base_substr(lst):
     return first[:x]
 
 def provider_from_key(providers: List[jidouteki.Provider]):
-    def _config_from_key(f):
+    def _provider_from_key(f):
         @wraps(f)
-        def __config(provider_key, *args, **kwargs):
+        def __provider(provider_key, *args, **kwargs):
             p: jidouteki.Provider = next((c for c in providers if c.meta.key == provider_key), None)
             if p == None: return abort(400)
             result = f(p, *args, **kwargs)
             return result
-        return __config
-    return _config_from_key
+        return __provider
+    return _provider_from_key
