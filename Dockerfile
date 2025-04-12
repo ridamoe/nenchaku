@@ -13,33 +13,26 @@
 # RUN apt-get install -y google-chrome-stable
 
 FROM python:3.12 AS base
-WORKDIR /tmp/lib
-COPY lib/jidouteki ./jidouteki
+RUN --mount=type=bind,source=./lib/jidouteki/,target=/tmp/jidouteki \
+pip install /tmp/jidouteki
 
-ENV PROVIDERS_DIR=/app/lib/jidouteki-providers/providers
-WORKDIR /app/lib/jidouteki-providers
-COPY lib/jidouteki-providers .
-RUN pip install -r requirements.txt
+RUN --mount=type=bind,source=./lib/parsers/,target=/tmp/parsers \
+pip install -r /tmp/parsers/requirements.txt
 
-FROM base AS dev
-RUN pip install -e /tmp/lib/jidouteki
+WORKDIR /app/lib/parsers
+COPY lib/parsers/parsers ./parsers
+ENV PARSERS_DIR=/app/lib/parsers
 
+FROM base AS app
 WORKDIR /app
 COPY requirements.txt .
 RUN pip install -r requirements.txt
 COPY src src
 
+FROM app AS dev
 CMD  ["flask", "--app", "src:app", "run", "--host", "0.0.0.0", "-p", "8080", "--debug"]
 
-FROM base AS prod
-WORKDIR /tmp/lib
-RUN pip install ./jidouteki
-
-WORKDIR /app
-COPY requirements.txt .
-RUN pip install -r requirements.txt
-COPY src src
-
+FROM app AS prod
 CMD ["hypercorn", "--bind", "0.0.0.0:8080", "src:app"]
 
 EXPOSE 8080
