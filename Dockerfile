@@ -20,7 +20,7 @@ RUN --mount=type=bind,source=./lib/parsers/,target=/tmp/parsers \
 pip install -r /tmp/parsers/requirements.txt
 
 WORKDIR /app/lib/parsers
-COPY lib/parsers/parsers ./parsers
+COPY lib/parsers/parsers .
 ENV PARSERS_DIR=/app/lib/parsers
 
 FROM base AS app
